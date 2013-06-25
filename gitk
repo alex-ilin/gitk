@@ -2586,7 +2586,7 @@ proc makewindow {} {
     makemenu $headctxmenu {
 	{mc "Check out this branch" command cobranch}
 	{mc "Remove this branch" command rmbranch}
-	{mc "Track this branch"  command track_remote_branch_dialog}
+	{mc "Follow this branch"  command follow_remote_branch_dialog}
     }
     $headctxmenu configure -tearoff 0
 
@@ -9508,20 +9508,20 @@ proc headmenu {x y id head} {
     tk_popup $headctxmenu $x $y
 }
 
-proc track_remote_branch_dialog {} {
+proc follow_remote_branch_dialog {} {
     global headmenuhead NS
 
     # check the tree is clean first??
-    nowbusy createTrackingBranch [mc "Creating tracking branch"]
+    nowbusy createFollowingBranch [mc "Creating following branch"]
     update
     dohidelocalchanges
 
-    set top .create_tracking_branch
+    set top .create_following_branch
     catch {destroy $top}
     ttk_toplevel $top
     make_transient $top .
 
-    ${NS}::label $top.title -text [mc "Create tracking branch"]
+    ${NS}::label $top.title -text [mc "Create following branch"]
     grid $top.title - -pady 10
 
     ${NS}::label $top.remote_branch_name_label -text [mc "Remote Branch:"]
@@ -9534,8 +9534,8 @@ proc track_remote_branch_dialog {} {
     ${NS}::entry $top.new_branch_name -width 40
     grid $top.new_branch_name_label $top.new_branch_name -sticky w
 
-    set actionCreate [list track_remote_branch_callback $top]
-    set actionCancel "catch {notbusy createTrackingBranch; destroy $top}"
+    set actionCreate [list follow_remote_branch_callback $top]
+    set actionCancel "catch {notbusy createFollowingBranch; destroy $top}"
 
     ${NS}::frame $top.buts
     ${NS}::button $top.buts.go  -text [mc "Create"] -command $actionCreate
@@ -9551,7 +9551,7 @@ proc track_remote_branch_dialog {} {
     focus $top.new_branch_name
 }
 
-proc track_remote_branch_callback {top} {
+proc follow_remote_branch_callback {top} {
     global headids idheads NS
     set new_branch_name    [$top.new_branch_name get]
     set remote_branch_name [$top.remote_branch_name get]
@@ -9572,10 +9572,10 @@ proc track_remote_branch_callback {top} {
     if {[catch {
 	eval exec git branch --track $cmdargs
     } err]} {
-	notbusy createTrackingBranch
+	notbusy createFollowingBranch
 	error_popup $err
     } else {
-	notbusy createTrackingBranch
+	notbusy createFollowingBranch
 	updatecommits
     }
 }
