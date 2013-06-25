@@ -9532,6 +9532,9 @@ proc follow_remote_branch_dialog {} {
 
     ${NS}::label $top.new_branch_name_label -text [mc "Name:"]
     ${NS}::entry $top.new_branch_name -width 40
+    set suggested_name $headmenuhead
+    regsub {^remotes/[^/]*/} $suggested_name {} suggested_name
+    $top.new_branch_name insert 0 $suggested_name
     grid $top.new_branch_name_label $top.new_branch_name -sticky w
 
     set actionCreate [list follow_remote_branch_callback $top]
