@@ -2586,6 +2586,7 @@ proc makewindow {} {
     makemenu $headctxmenu {
 	{mc "Check out this branch" command cobranch}
 	{mc "Remove this branch" command rmbranch}
+	{mc "Track this branch"  command track_remote_branch_dialog}
     }
     $headctxmenu configure -tearoff 0
 
@@ -9491,16 +9492,92 @@ proc headmenu {x y id head} {
     stopfinding
     set headmenuid $id
     set headmenuhead $head
-    set state normal
     if {[string match "remotes/*" $head]} {
-	set state disabled
+	$headctxmenu entryconfigure 0 -state disabled
+	$headctxmenu entryconfigure 1 -state disabled
+	$headctxmenu entryconfigure 2 -state normal
+    } elseif {$head eq $mainhead} {
+	$headctxmenu entryconfigure 0 -state disabled
+	$headctxmenu entryconfigure 1 -state disabled
+	$headctxmenu entryconfigure 2 -state disabled
+    } else {
+	$headctxmenu entryconfigure 0 -state normal
+	$headctxmenu entryconfigure 1 -state normal
+	$headctxmenu entryconfigure 2 -state disabled
     }
-    if {$head eq $mainhead} {
-	set state disabled
-    }
-    $headctxmenu entryconfigure 0 -state $state
-    $headctxmenu entryconfigure 1 -state $state
     tk_popup $headctxmenu $x $y
+}
+
+proc track_remote_branch_dialog {} {
+    global headmenuhead NS
+
+    # check the tree is clean first??
+    nowbusy createTrackingBranch [mc "Creating tracking branch"]
+    update
+    dohidelocalchanges
+
+    set top .create_tracking_branch
+    catch {destroy $top}
+    ttk_toplevel $top
+    make_transient $top .
+
+    ${NS}::label $top.title -text [mc "Create tracking branch"]
+    grid $top.title - -pady 10
+
+    ${NS}::label $top.remote_branch_name_label -text [mc "Remote Branch:"]
+    ${NS}::entry $top.remote_branch_name -width 40
+    $top.remote_branch_name insert 0 $headmenuhead
+    $top.remote_branch_name conf -state readonly
+    grid $top.remote_branch_name_label $top.remote_branch_name -sticky w
+
+    ${NS}::label $top.new_branch_name_label -text [mc "Name:"]
+    ${NS}::entry $top.new_branch_name -width 40
+    grid $top.new_branch_name_label $top.new_branch_name -sticky w
+
+    set actionCreate [list track_remote_branch_callback $top]
+    set actionCancel "catch {notbusy createTrackingBranch; destroy $top}"
+
+    ${NS}::frame $top.buts
+    ${NS}::button $top.buts.go  -text [mc "Create"] -command $actionCreate
+    ${NS}::button $top.buts.can -text [mc "Cancel"] -command $actionCancel
+    grid $top.buts.go $top.buts.can
+    grid columnconfigure $top.buts 0 -weight 1 -uniform a
+    grid columnconfigure $top.buts 1 -weight 1 -uniform a
+    grid $top.buts - -pady 10 -sticky ew
+
+    bind $top <Key-Return> $actionCreate
+    bind $top <Key-Escape> $actionCancel
+
+    focus $top.new_branch_name
+}
+
+proc track_remote_branch_callback {top} {
+    global headids idheads NS
+    set new_branch_name    [$top.new_branch_name get]
+    set remote_branch_name [$top.remote_branch_name get]
+    set cmdargs {}
+
+    if {$new_branch_name eq {}} {
+	error_popup [mc "Please specify a name for the new branch"] $top
+	return
+    }
+    if {[info exists headids($new_branch_name)]} {
+	error_popup [mc "The branch name you specified already exists, please specify a new name"] $top
+	return
+    }
+    catch {destroy $top}
+
+    lappend cmdargs $new_branch_name $remote_branch_name
+
+    if {[catch {
+	eval exec git branch --track $cmdargs
+    } err]} {
+	notbusy createTrackingBranch
+	error_popup $err
+    } else {
+	notbusy createTrackingBranch
+	updatecommits
+    }
 }
 
 proc cobranch {} {
