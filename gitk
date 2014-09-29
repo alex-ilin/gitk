@@ -2601,6 +2601,9 @@ proc makewindow {} {
     bind $ctext $ctxbut {pop_diff_menu %W %X %Y %x %y}
     bind $ctext <Button-1> {focus %W}
     bind $ctext <<Selection>> rehighlight_search_results
+    for {set i 1} {$i < 10} {incr i} {
+	bind . <$M1B-Key-$i> [list go_to_parent $i]
+    }
 
     set maincursor [. cget -cursor]
     set textcursor [$ctext cget -cursor]
@@ -2796,7 +2799,7 @@ proc savestuff {w} {
     global mainheadcirclecolor workingfilescirclecolor indexcirclecolor
     global linkfgcolor circleoutlinecolor
     global autoselect autosellen extdifftool perfile_attrs markbgcolor use_ttk
-    global hideremotes want_ttk maxrefs
+    global hideremotes want_ttk maxrefs visiblerefs
     global config_file config_file_tmp
 
     if {$stuffsaved} return
@@ -2822,6 +2825,7 @@ proc savestuff {w} {
 	puts $f [list set autosellen $autosellen]
 	puts $f [list set showneartags $showneartags]
 	puts $f [list set maxrefs $maxrefs]
+	puts $f [list set visiblerefs $visiblerefs]
 	puts $f [list set hideremotes $hideremotes]
 	puts $f [list set showlocalchanges $showlocalchanges]
 	puts $f [list set datetimeformat $datetimeformat]
@@ -3025,6 +3029,7 @@ proc keys {} {
 [mc "<Down>, n, j	Move down one commit"]
 [mc "<Left>, z, h	Go back in history list"]
 [mc "<Right>, x, l	Go forward in history list"]
+[mc "<%s-n>	Go to n-th parent of current commit in history list" $M1T]
 [mc "<PageUp>	Move up one page in commit list"]
 [mc "<PageDown>	Move down one page in commit list"]
 [mc "<%s-Home>	Scroll to top of commit list" $M1T]
@@ -3520,7 +3525,9 @@ proc gitknewtmpdir {} {
 	    set tmpdir $gitdir
 	}
 	set gitktmpformat [file join $tmpdir ".gitk-tmp.XXXXXX"]
-	set gitktmpdir [exec mktemp -d $gitktmpformat]
+	if {[catch {set gitktmpdir [exec mktemp -d $gitktmpformat]}]} {
+	    set gitktmpdir [file join $gitdir [format ".gitk-tmp.%s" [pid]]]
+	}
 	if {[catch {file mkdir $gitktmpdir} err]} {
 	    error_popup "[mc "Error creating temporary directory %s:" $gitktmpdir] $err"
 	    unset gitktmpdir
@@ -7077,7 +7084,7 @@ proc viewnextline {dir} {
 # add a list of tag or branch names at position pos
 # returns the number of names inserted
 proc appendrefs {pos ids var} {
-    global ctext linknum curview $var maxrefs mainheadid
+    global ctext linknum curview $var maxrefs visiblerefs mainheadid
 
     if {[catch {$ctext index $pos}]} {
 	return 0
@@ -7098,14 +7105,14 @@ proc appendrefs {pos ids var} {
     if {[llength $tags] > $maxrefs} {
 	# If we are displaying heads, and there are too many,
 	# see if there are some important heads to display.
-	# Currently this means "master" and the current head.
+	# Currently that are the current head and heads listed in $visiblerefs option
 	set itags {}
 	if {$var eq "idheads"} {
 	    set utags {}
 	    foreach ti $tags {
 		set hname [lindex $ti 0]
 		set id [lindex $ti 1]
-		if {($hname eq "master" || $id eq $mainheadid) &&
+		if {([lsearch -exact $visiblerefs $hname] != -1 || $id eq $mainheadid) &&
 		    [llength $itags] < $maxrefs} {
 		    lappend itags $ti
 		} else {
@@ -7535,6 +7542,14 @@ proc goforw {} {
     }
     if {$historyindex >= [llength $history]} {
 	.tf.bar.rightbut conf -state disabled
+    }
+}
+
+proc go_to_parent {i} {
+    global parents curview targetid
+    set ps $parents($curview,$targetid)
+    if {[llength $ps] >= $i} {
+	selbyid [lindex $ps [expr $i - 1]]
     }
 }
 
@@ -12275,6 +12290,7 @@ set wrapcomment "none"
 set showneartags 1
 set hideremotes 0
 set maxrefs 20
+set visiblerefs {"master"}
 set maxlinelen 200
 set showlocalchanges 1
 set limitdiffs 1
