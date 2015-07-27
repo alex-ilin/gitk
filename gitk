@@ -9910,6 +9910,7 @@ proc show_tree_of_references_dialog {view_type} {
 
     ttk_toplevel $top
     wm title $top [mc "$dialogName: %s" [file tail [pwd]]]
+    wm geometry $top "600x900"
 
     make_transient $top .
 
