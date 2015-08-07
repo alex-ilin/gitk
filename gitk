@@ -2650,30 +2650,32 @@ proc makewindow {} {
     set textcursor [$ctext cget -cursor]
     set curtextcursor $textcursor
 
+    # When changing this menu update indexes in proc rowmenu.
     set rowctxmenu .rowctxmenu
     makemenu $rowctxmenu {
+	{mc "Create new branch" command mkbranch}
+	{mc "Reset HEAD branch to here" command resethead}
+	{mc "Cherry-pick this commit" command cherrypick}
+	{mc "Create tag" command mktag}
+	{xx "" separator}
 	{mc "Diff this -> selected" command {diffvssel 0}}
 	{mc "Diff selected -> this" command {diffvssel 1}}
-	{mc "Make patch" command mkpatch}
-	{mc "Create tag" command mktag}
-	{mc "Copy commit summary" command copysummary}
-	{mc "Write commit to file" command writecommit}
-	{mc "Create new branch" command mkbranch}
-	{mc "Cherry-pick this commit" command cherrypick}
-	{mc "Reset HEAD branch to here" command resethead}
+	{mc "DirDiffTool this -> selected" command {externalDiffToolVsSel 0}}
+	{mc "DirDiffTool selected -> this" command {externalDiffToolVsSel 1}}
+	{xx "" separator}
 	{mc "Mark this commit" command markhere}
 	{mc "Return to mark" command gotomark}
 	{mc "Find descendant of this and mark" command find_common_desc}
 	{mc "Compare with marked commit" command compare_commits}
 	{mc "Diff this -> marked commit" command {diffvsmark 0}}
 	{mc "Diff marked commit -> this" command {diffvsmark 1}}
-	{mc "Revert this commit" command revert}
-
-	{mc "DirDiffTool this -> selected" command {externalDiffToolVsSel 0}}
-	{mc "DirDiffTool selected -> this" command {externalDiffToolVsSel 1}}
-
 	{mc "DirDiffTool this -> marked" command {externalDiffToolVsMarked 0}}
 	{mc "DirDiffTool marked -> this" command {externalDiffToolVsMarked 1}}
+	{xx "" separator}
+	{mc "Make patch" command mkpatch}
+	{mc "Copy commit summary" command copysummary}
+	{mc "Write commit to file" command writecommit}
+	{mc "Revert this commit" command revert}
     }
     $rowctxmenu configure -tearoff 0
 
@@ -2681,9 +2683,11 @@ proc makewindow {} {
     makemenu $fakerowmenu {
 	{mc "Diff this -> selected" command {diffvssel 0}}
 	{mc "Diff selected -> this" command {diffvssel 1}}
-	{mc "Make patch" command mkpatch}
+	{xx "" separator}
 	{mc "Diff this -> marked commit" command {diffvsmark 0}}
 	{mc "Diff marked commit -> this" command {diffvsmark 1}}
+	{xx "" separator}
+	{mc "Make patch" command mkpatch}
     }
     $fakerowmenu configure -tearoff 0
 
@@ -9094,13 +9098,13 @@ proc rowmenu {x y id} {
     if {$id ne $nullid && $id ne $nullid2} {
 	set menu $rowctxmenu
 	if {$mainhead ne {}} {
-	    $menu entryconfigure 8 -label [mc "Reset %s branch to here" $mainhead] -state normal
+	    $menu entryconfigure 1 -label [mc "Reset %s branch to here" $mainhead] -state normal
 	} else {
-	    $menu entryconfigure 8 -label [mc "Detached head: can't reset" $mainhead] -state disabled
+	    $menu entryconfigure 1 -label [mc "Detached head: can't reset" $mainhead] -state disabled
 	}
-	$menu entryconfigure 10 -state $mstate
-	$menu entryconfigure 11 -state $mstate
 	$menu entryconfigure 12 -state $mstate
+	$menu entryconfigure 13 -state $mstate
+	$menu entryconfigure 14 -state $mstate
     } else {
 	set menu $fakerowmenu
     }
