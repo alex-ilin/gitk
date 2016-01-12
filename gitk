@@ -6621,13 +6621,13 @@ proc drawtags {id x xt y1} {
     set xvals {}
     set wvals {}
     set newTags {}
-    
+
     set i -1
     foreach tag $marks {
 	incr i
 	set newTag $tag
 	regsub {^remotes} $newTag "r.." newTag
-	
+
 	if {$i >= $ntags && $i < $ntags + $nheads && $tag eq $mainhead} {
 	    set wid [font measure mainfontbold $newTag]
 	} else {
