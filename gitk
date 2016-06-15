@@ -2655,6 +2655,7 @@ proc makewindow {} {
     makemenu $rowctxmenu {
 	{mc "Create new branch" command mkbranch}
 	{mc "Reset HEAD branch to here" command resethead}
+	{mc "Interactive rebase onto here" command rebasehere}
 	{mc "Cherry-pick this commit" command cherrypick}
 	{mc "Create tag" command mktag}
 	{xx "" separator}
@@ -9108,9 +9109,9 @@ proc rowmenu {x y id} {
 	} else {
 	    $menu entryconfigure 1 -label [mc "Detached head: can't reset" $mainhead] -state disabled
 	}
-	$menu entryconfigure 12 -state $mstate
 	$menu entryconfigure 13 -state $mstate
 	$menu entryconfigure 14 -state $mstate
+	$menu entryconfigure 15 -state $mstate
     } else {
 	set menu $fakerowmenu
     }
@@ -10013,6 +10014,12 @@ proc resethead {} {
 	nowbusy reset [mc "Resetting"]
 	selbyid $rowmenuid
     }
+}
+
+proc rebasehere {} {
+    global rowmenuid
+    exec cmd /k git rebase -i $rowmenuid
+    run updatecommits
 }
 
 proc readresetstat {fd} {
