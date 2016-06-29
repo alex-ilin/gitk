@@ -2714,6 +2714,7 @@ proc makewindow {} {
 	{mc "External diff" command {external_diff}}
 	{mc "Save file as" command {save_file_as}}
 	{mc "Blame parent commit" command {external_blame 1}}
+	{mc "Edit file" command {edit_in_wc}}
 	{mc "Copy path" command {clipboard clear; clipboard append $flist_menu_file}}
     }
     $flist_menu configure -tearoff 0
@@ -3729,6 +3730,15 @@ proc external_diff {} {
             fconfigure $fl -blocking 0
             filerun $fl [list delete_at_eof $fl $diffdir]
         }
+    }
+}
+
+proc edit_in_wc {} {
+    global worktree
+    global flist_menu_file
+    set edit_cmd [exec git config core.editor]
+    if { [catch { exec $edit_cmd [file join $worktree $flist_menu_file] &} msg] } {
+        # igrore errors, if any
     }
 }
 
