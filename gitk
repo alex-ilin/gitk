@@ -2700,7 +2700,7 @@ proc makewindow {} {
     makemenu $headctxmenu {
 	{mc "Check out this branch" command cobranch}
 	{mc "Rename this branch" command mvbranch}
-	{mc "Remove this branch" command rmbranch}
+	{mc "Delete this branch" command rmbranch}
 	{mc "Copy branch name" command {clipboard clear; clipboard append $headmenuhead}}
 	{mc "Follow this branch"  command follow_remote_branch_dialog}
     }
