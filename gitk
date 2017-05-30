@@ -2664,6 +2664,9 @@ proc makewindow {} {
 
 	{mc "DirDiffTool this -> selected" command {externalDiffToolVsSel 0}}
 	{mc "DirDiffTool selected -> this" command {externalDiffToolVsSel 1}}
+
+	{mc "DirDiffTool this -> marked" command {externalDiffToolVsMarked 0}}
+	{mc "DirDiffTool marked -> this" command {externalDiffToolVsMarked 1}}
     }
     $rowctxmenu configure -tearoff 0
 
@@ -9315,6 +9318,22 @@ proc externalDiffToolVsSel {diffDirection} {
     }
     [exec git difftool -d $oldid $newid]
 }
+
+proc externalDiffToolVsMarked {diffDirection} {
+    global rowmenuid markedid
+
+    if {![info exists markedid]} return
+
+    if {$diffDirection} {
+	set oldid $markedid
+	set newid $rowmenuid
+    } else {
+	set oldid $rowmenuid
+	set newid $markedid
+    }
+    [exec git difftool -d $oldid $newid]
+}
+
 
 proc diffvsmark {dirn} {
     global rowmenuid markedid
