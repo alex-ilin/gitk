@@ -2560,8 +2560,13 @@ proc makewindow {} {
     bindall <B$::BM-Motion> "canvscan dragto %W %x %y"
     bind all <$M1B-Key-w> {destroy [winfo toplevel %W]}
     bind . <$M1B-Key-w> doquit
+    bindkey q doquit
+    bindkey Q doquit
     bindkey <Home> selfirstline
+    bindkey 0 selfirstline
+    bindkey gg selfirstline
     bindkey <End> sellastline
+    bindkey G sellastline
     bind . <Key-Up> "selnextline -1"
     bind . <Key-Down> "selnextline 1"
     bind . <Shift-Key-Up> "dofind -1 0"
@@ -2578,6 +2583,8 @@ proc makewindow {} {
     bind . <$M1B-Key-Next> "allcanvs yview scroll 1 pages"
     bindkey <Key-Delete> "$ctext yview scroll -1 pages"
     bindkey <Key-BackSpace> "$ctext yview scroll -1 pages"
+    bindkey K "$ctext yview scroll -1 pages"
+    bindkey J "$ctext yview scroll 1 pages"
     bindkey <Key-space> "$ctext yview scroll 1 pages"
     bindkey p "selnextline -1"
     bindkey n "selnextline 1"
