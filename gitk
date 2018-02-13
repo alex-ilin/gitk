@@ -6716,7 +6716,7 @@ proc drawtags {id x xt y1} {
     global idtags idheads idotherrefs mainhead
     global linespc lthickness
     global canv rowtextx curview fgcolor bgcolor ctxbut
-    global headbgcolor headfgcolor headoutlinecolor remotebgcolor
+    global headbgcolor headfgcolor headoutlinecolor remotebgcolor stashbgcolor
     global tagbgcolor tagfgcolor tagoutlinecolor
     global reflinecolor
 
@@ -6809,7 +6809,7 @@ proc drawtags {id x xt y1} {
 		    set font mainfontbold
 		}
 	    } else {
-		set col "#ddddff"
+		set col $stashbgcolor
 	    }
 	    set xl [expr {$xl - $delta/2}]
 	    $canv create polygon $x $yt $xr $yt $xr $yb $x $yb \
@@ -12742,6 +12742,7 @@ set markbgcolor "#e0e0ff"
 set headbgcolor "#00ff00"
 set headfgcolor black
 set headoutlinecolor black
+set stashbgcolor #ddddff
 set remotebgcolor #ffddaa
 set tagbgcolor yellow
 set tagfgcolor black
@@ -12800,7 +12801,7 @@ set config_variables {
     bgcolor fgcolor uifgcolor uifgdisabledcolor colors diffcolors mergecolors
     markbgcolor diffcontext selectbgcolor foundbgcolor currentsearchhitbgcolor
     extdifftool perfile_attrs headbgcolor headfgcolor headoutlinecolor
-    remotebgcolor tagbgcolor tagfgcolor tagoutlinecolor reflinecolor
+    remotebgcolor stashbgcolor tagbgcolor tagfgcolor tagoutlinecolor reflinecolor
     filesepbgcolor filesepfgcolor linehoverbgcolor linehoverfgcolor
     linehoveroutlinecolor mainheadcirclecolor workingfilescirclecolor
     indexcirclecolor circlecolors linkfgcolor circleoutlinecolor
