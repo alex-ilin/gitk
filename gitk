@@ -2706,7 +2706,7 @@ proc makewindow {} {
     }
     $headctxmenu configure -tearoff 0
 
-    global flist_menu
+    global flist_menu worktree
     set flist_menu .flistctxmenu
     makemenu $flist_menu {
 	{mc "Highlight this too" command {flist_hl 0}}
@@ -2715,7 +2715,7 @@ proc makewindow {} {
 	{mc "Save file as" command {save_file_as}}
 	{mc "Blame parent commit" command {external_blame 1}}
 	{mc "Edit file" command {edit_in_wc}}
-	{mc "Copy path" command {clipboard clear; clipboard append $flist_menu_file}}
+	{mc "Copy path" command {clipboard clear; clipboard append [file join $worktree $flist_menu_file]}}
     }
     $flist_menu configure -tearoff 0
 
