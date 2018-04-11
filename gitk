@@ -2683,9 +2683,13 @@ proc makewindow {} {
     makemenu $fakerowmenu {
 	{mc "Diff this -> selected" command {diffvssel 0}}
 	{mc "Diff selected -> this" command {diffvssel 1}}
+	{mc "DirDiffTool this -> selected" command {externalDiffToolVsSel 0}}
+	{mc "DirDiffTool selected -> this" command {externalDiffToolVsSel 1}}
 	{xx "" separator}
 	{mc "Diff this -> marked commit" command {diffvsmark 0}}
 	{mc "Diff marked commit -> this" command {diffvsmark 1}}
+	{mc "DirDiffTool this -> marked" command {externalDiffToolVsMarked 0}}
+	{mc "DirDiffTool marked -> this" command {externalDiffToolVsMarked 1}}
 	{xx "" separator}
 	{mc "Make patch" command mkpatch}
     }
