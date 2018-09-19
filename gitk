@@ -10162,10 +10162,12 @@ proc revert {} {
 }
 
 proc resethead {} {
-    global mainhead rowmenuid confirm_ok resettype NS
+    global mainhead rowmenuid confirm_ok resethead_close resettype NS
 
     set confirm_ok 0
+    set resethead_close 0
     set w ".confirmreset"
+    set ok_cmd "set confirm_ok 1; set resethead_close 1"
     ttk_toplevel $w
     make_transient $w .
     wm title $w [mc "Confirm reset"]
@@ -10177,20 +10179,24 @@ proc resethead {} {
     ${NS}::radiobutton $w.f.soft -value soft -variable resettype \
 	-text [mc "Soft: Leave working tree and index untouched"]
     grid $w.f.soft -sticky w
+    bind $w.f.soft <Double-1> $ok_cmd
     ${NS}::radiobutton $w.f.mixed -value mixed -variable resettype \
 	-text [mc "Mixed: Leave working tree untouched, reset index"]
     grid $w.f.mixed -sticky w
+    bind $w.f.mixed <Double-1> $ok_cmd
     ${NS}::radiobutton $w.f.hard -value hard -variable resettype \
 	-text [mc "Hard: Reset working tree and index\n(discard ALL local changes)"]
     grid $w.f.hard -sticky w
+    bind $w.f.hard <Double-1> $ok_cmd
     pack $w.f -side top -fill x -padx 4
-    ${NS}::button $w.ok -text [mc OK] -command "set confirm_ok 1; destroy $w"
+    ${NS}::button $w.ok -text [mc OK] -command $ok_cmd
     pack $w.ok -side left -fill x -padx 20 -pady 20
-    ${NS}::button $w.cancel -text [mc Cancel] -command "destroy $w"
-    bind $w <Key-Escape> [list destroy $w]
+    ${NS}::button $w.cancel -text [mc Cancel] -command "set resethead_close 1"
+    bind $w <Key-Escape> "set resethead_close 1"
     pack $w.cancel -side right -fill x -padx 20 -pady 20
     bind $w <Visibility> "grab $w; focus $w"
-    tkwait window $w
+    tkwait variable resethead_close
+    destroy $w
     if {!$confirm_ok} return
     if {[catch {set fd [open \
 	    [list | git reset --$resettype $rowmenuid 2>@1] r]} err]} {
