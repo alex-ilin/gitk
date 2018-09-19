@@ -2247,6 +2247,9 @@ proc makewindow {} {
 	.tf.bar.rightbut configure -image bm-right
     }
     pack .tf.bar.rightbut -side left -fill y
+    ${NS}::button .tf.bar.headbut -text [mc "HEAD"] -command gohead \
+	-width 5
+    pack .tf.bar.headbut -side left -fill y
 
     ${NS}::label .tf.bar.rowlabel -text [mc "Row"]
     set rownumsel {}
@@ -7767,6 +7770,13 @@ proc goforw {} {
     if {$historyindex >= [llength $history]} {
 	.tf.bar.rightbut conf -state disabled
     }
+}
+
+proc gohead {} {
+    global sha1string
+
+    set sha1string "HEAD"
+    gotocommit
 }
 
 proc go_to_parent {i} {
