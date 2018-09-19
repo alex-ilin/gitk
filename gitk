@@ -2093,6 +2093,7 @@ proc makewindow {} {
 	    {mc "List Remote Branches" command {show_tree_of_references_dialog "remoteBranches"} -accelerator F7}
 	    {mc "List Tags"            command {show_tree_of_references_dialog "tags"}           -accelerator F8}
 	    {xx "" separator}
+	    {mc "Start &Bash" command {exec cmd.exe /c bash.exe &} -accelerator F9}
 	    {mc "Start git &gui" command {exec git gui &}}
 	    {xx "" separator}
 	    {mc "&Quit" command doquit -accelerator Meta1-Q}
@@ -2618,6 +2619,7 @@ proc makewindow {} {
     bind . <F6> {show_tree_of_references_dialog "localBranches"}
     bind . <F7> {show_tree_of_references_dialog "remoteBranches"}
     bind . <F8> {show_tree_of_references_dialog "tags"}
+    bind . <F9> {exec cmd.exe /c bash.exe &}
     bindmodfunctionkey Shift 4 {newview 0}
     bind . <F4> edit_or_newview
     bind . <$M1B-q> doquit
