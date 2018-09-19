@@ -8907,6 +8907,22 @@ proc resolveshortname {name} {
 
 proc gotocommit {} {
     global sha1string tagids headids curview varcid
+
+    # If a range of commits is requested, mark the first one, then select
+    # the second one and show a diff between them.
+    set sha1string [string trim $sha1string]
+    set pos [string first .. $sha1string]
+    if {$pos > 0} {
+	set firstrev [resolveshortname [string range $sha1string 0 [expr $pos - 1]]]
+	if {$firstrev == {}} return
+
+	markthis $firstrev
+	# The second hash of the range will be selected.
+	set sha1string [string range $sha1string [expr $pos + 2] end]
+    } else {
+	set firstrev {}
+    }
+
     if {$sha1string == {}
 	|| ([info exists currentid] && $sha1string == $currentid)} return
 
@@ -8915,6 +8931,10 @@ proc gotocommit {} {
 
     if {[commitinview $id $curview]} {
 	selectline [rowofcommit $id] 1
+	# If a range of commits was requested, do a diff of the range.
+	if {$firstrev != {}} {
+	    doseldiff $firstrev $id
+	}
     } else {
 	error_popup [mc "Revision %s is not in the current view" $sha1string]
     }
