@@ -8873,43 +8873,51 @@ proc sha1change {n1 n2 op} {
     }
 }
 
-proc gotocommit {} {
-    global sha1string tagids headids curview varcid
+proc resolveshortname {name} {
+    # name is a short hash, a branch or a tag name. Return full hash.
+    global tagids headids
 
-    if {$sha1string == {}
-	|| ([info exists currentid] && $sha1string == $currentid)} return
-    if {[info exists tagids($sha1string)]} {
-	set id $tagids($sha1string)
-    } elseif {[info exists headids($sha1string)]} {
-	set id $headids($sha1string)
+    if {[info exists tagids($name)]} {
+	return $tagids($name)
+    } elseif {[info exists headids($name)]} {
+	return $headids($name)
     } else {
-	set id [string tolower $sha1string]
-	if {[regexp {^[0-9a-f]{4,39}$} $id]} {
+	set id [string tolower $name]
+	if {[regexp {^[0-9a-f]{4,40}$} $id]} {
 	    set matches [longid $id]
 	    if {$matches ne {}} {
 		if {[llength $matches] > 1} {
 		    error_popup [mc "Short SHA1 id %s is ambiguous" $id]
-		    return
+		} else {
+		    set id [lindex $matches 0]
 		}
-		set id [lindex $matches 0]
+	    } else {
+		error_popup [mc "SHA1 id %s is not known" $name]
+		set id {}
 	    }
 	} else {
-	    if {[catch {set id [exec git rev-parse --verify $sha1string]}]} {
-		error_popup [mc "Revision %s is not known" $sha1string]
-		return
+	    if {[catch {set id [exec git rev-parse --verify $name]}]} {
+		error_popup [mc "Revision %s is not known" $name]
+		set id {}
 	    }
 	}
+	return $id
     }
+}
+
+proc gotocommit {} {
+    global sha1string tagids headids curview varcid
+    if {$sha1string == {}
+	|| ([info exists currentid] && $sha1string == $currentid)} return
+
+    set id [resolveshortname $sha1string]
+    if {$id == {}} return
+
     if {[commitinview $id $curview]} {
 	selectline [rowofcommit $id] 1
-	return
-    }
-    if {[regexp {^[0-9a-fA-F]{4,}$} $sha1string]} {
-	set msg [mc "SHA1 id %s is not known" $sha1string]
     } else {
-	set msg [mc "Revision %s is not in the current view" $sha1string]
+	error_popup [mc "Revision %s is not in the current view" $sha1string]
     }
-    error_popup $msg
 }
 
 proc lineenter {x y id} {
