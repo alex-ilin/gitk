@@ -10421,6 +10421,7 @@ proc showrefs {} {
     if {[winfo exists $top]} {
 	raise $top
 	refill_reflist
+	focus $top
 	return
     }
     ttk_toplevel $top
@@ -10458,6 +10459,7 @@ proc showrefs {} {
     bind $top.list <ButtonRelease-1> {sel_reflist %W %x %y; break}
     set reflist {}
     refill_reflist
+    focus $top
 }
 
 proc sel_reflist {w x y} {
