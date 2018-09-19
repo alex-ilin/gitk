@@ -9133,11 +9133,16 @@ proc rowmenu {x y id} {
     tk_popup $menu $x $y
 }
 
-proc markhere {} {
-    global rowmenuid markedid canv
+proc markthis {id} {
+    global markedid
 
-    set markedid $rowmenuid
+    set markedid $id
     make_idmark $markedid
+}
+
+proc markhere {} {
+    global rowmenuid
+    markthis $rowmenuid
 }
 
 proc gotomark {} {
