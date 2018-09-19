@@ -10176,6 +10176,7 @@ proc branchdia {top valvar uivar} {
     grid columnconfigure $top.buts 1 -weight 1 -uniform a
     grid $top.buts - -pady 10 -sticky ew
     focus $top.name
+    # TODO: if new branch name matches the current branch name, call resethead
 }
 
 proc mkbrgo {top} {
