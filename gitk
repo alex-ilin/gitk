@@ -2234,6 +2234,9 @@ proc makewindow {} {
     image create bitmap bm-right -data $bm_right_data -foreground $uifgcolor
     image create bitmap bm-right-gray -data $bm_right_data -foreground $uifgdisabledcolor
 
+    ${NS}::button .tf.bar.copy8 -text [mc "Copy"] -command CopyHash8 \
+	-width 5
+    pack .tf.bar.copy8 -side left -fill y
     ${NS}::button .tf.bar.leftbut -command goback -state disabled -width 26
     if {$use_ttk} {
 	.tf.bar.leftbut configure -image [list bm-left disabled bm-left-gray]
@@ -7779,6 +7782,12 @@ proc gohead {} {
 
     set sha1string "HEAD"
     gotocommit
+}
+
+proc CopyHash8 {} {
+    global sha1string
+    clipboard clear
+    clipboard append [string range $sha1string 0 7]
 }
 
 proc go_to_parent {i} {
