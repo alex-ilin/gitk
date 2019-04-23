@@ -7219,20 +7219,31 @@ proc commit_descriptor {p} {
 }
 
 # append some text to the ctext widget, and make any SHA1 ID
-# that we know about be a clickable link.
+# that we know about and Jira issue IDs be clickable links.
 proc appendwithlinks {text tags} {
-    global ctext linknum curview
+    global ctext
 
     set start [$ctext index "end - 1c"]
     $ctext insert end $text $tags
+
+    # Add the links for the SHA1 IDs found in the $text.
     set links [regexp -indices -all -inline {(?:\m|-g)[0-9a-f]{6,40}\M} $text]
+    setlinks $links $text $start
+
+    # Add the links for the Jira issue IDs found in the $text.
+    set links [regexp -indices -all -inline {\m[a-zA-Z]+-[0-9]+\M} $text]
+    setlinks $links $text $start
+}
+
+proc setlinks {links text offset} {
+    global ctext linknum
     foreach l $links {
 	set s [lindex $l 0]
 	set e [lindex $l 1]
 	set linkid [string range $text $s $e]
 	incr e
 	$ctext tag delete link$linknum
-	$ctext tag add link$linknum "$start + $s c" "$start + $e c"
+	$ctext tag add link$linknum "$offset + $s c" "$offset + $e c"
 	setlink $linkid link$linknum
 	incr linknum
     }
@@ -7240,32 +7251,47 @@ proc appendwithlinks {text tags} {
 
 proc setlink {id lk} {
     global curview ctext pendinglinks
-    global linkfgcolor
+    global linkfgcolor jira_url
 
     if {[string range $id 0 1] eq "-g"} {
       set id [string range $id 2 end]
     }
 
-    set known 0
-    if {[string length $id] < 40} {
-	set matches [longid $id]
-	if {[llength $matches] > 0} {
-	    if {[llength $matches] > 1} return
-	    set known 1
-	    set id [lindex $matches 0]
-	}
+    # If the id contains "-", it's a Jira issue link.
+    if {($jira_url != "") && ([string first "-" $id] > 0)} {
+	set known 2
     } else {
-	set known [commitinview $id $curview]
+	# Otherwise it could be a SHA1 ID.
+	set known 0
+	if {[string length $id] < 40} {
+	    set matches [longid $id]
+	    if {[llength $matches] > 0} {
+		if {[llength $matches] > 1} return
+		set known 1
+		set id [lindex $matches 0]
+	    }
+	} else {
+	    set known [commitinview $id $curview]
+	}
     }
     if {$known} {
 	$ctext tag conf $lk -foreground $linkfgcolor -underline 1
-	$ctext tag bind $lk <1> [list selbyid $id]
+	if {$known eq 2} {
+	    # Jira issue.
+	    $ctext tag bind $lk <1> [list open_url "$jira_url/browse/$id"]
+	} else {
+	    $ctext tag bind $lk <1> [list selbyid $id]
+	}
 	$ctext tag bind $lk <Enter> {linkcursor %W 1}
 	$ctext tag bind $lk <Leave> {linkcursor %W -1}
     } else {
 	lappend pendinglinks($id) $lk
 	interestedin $id {makelink %P}
     }
+}
+
+proc open_url {url} {
+    eval exec [auto_execok start] $url
 }
 
 proc appendshortlink {id {pre {}} {post {}}} {
@@ -11980,7 +12006,7 @@ proc create_prefs_page {w} {
 proc prefspage_general {notebook} {
     global NS maxwidth maxgraphpct showneartags showlocalchanges
     global tabstop limitdiffs autoselect autosellen extdifftool perfile_attrs
-    global hideremotes want_ttk have_ttk maxrefs
+    global hideremotes want_ttk have_ttk maxrefs jira_url
 
     set page [create_prefs_page $notebook.general]
 
@@ -12030,6 +12056,13 @@ proc prefspage_general {notebook} {
     pack $page.extdifff.l $page.extdifff.b -side left
     pack configure $page.extdifff.l -padx 10
     grid x $page.extdifff $page.extdifft -sticky ew
+
+    ${NS}::entry $page.jira_urlt -textvariable jira_url
+    ${NS}::frame $page.jira_urlf
+    ${NS}::label $page.jira_urlf.l -text [mc "Jira URL:" ]
+    pack $page.jira_urlf.l -side left
+    pack configure $page.jira_urlf.l -padx 10
+    grid x $page.jira_urlf $page.jira_urlt -sticky ew
 
     ${NS}::label $page.lgen -text [mc "General options"]
     grid $page.lgen - -sticky w -pady 10
@@ -12257,7 +12290,7 @@ proc prefsok {} {
     global oldprefs prefstop showneartags showlocalchanges
     global fontpref mainfont textfont uifont
     global limitdiffs treediffs perfile_attrs
-    global hideremotes
+    global hideremotes jira_url
 
     catch {destroy $prefstop}
     unset prefstop
@@ -12305,6 +12338,21 @@ proc prefsok {} {
     }
     if {$hideremotes != $oldprefs(hideremotes)} {
 	rereadrefs
+    }
+
+    set jira_url [string trim $jira_url]
+    if {$jira_url != ""} {
+	# Make sure jira_url starts with a protocol prefix. We don't want
+	# to run random executables instead of opening URLs when user
+	# clicks a link.
+	if {[string first "http://" $jira_url] eq 0} {
+	} elseif {[string first "https://" $jira_url] eq 0} {
+	} else {
+	    # If neither http:// nor https:// are specified, add https://.
+	    set jira_url "https://$jira_url"
+	}
+	# Remove the trailing slash, if any.
+	set jira_url [string trimright $jira_url "/"]
     }
 }
 
@@ -12838,6 +12886,7 @@ set linkfgcolor blue
 set circleoutlinecolor $fgcolor
 set foundbgcolor yellow
 set currentsearchhitbgcolor orange
+set jira_url ""
 
 # button for popping up context menus
 if {[tk windowingsystem] eq "aqua"} {
@@ -12881,7 +12930,7 @@ set config_variables {
     remotebgcolor stashbgcolor tagbgcolor tagfgcolor tagoutlinecolor reflinecolor
     filesepbgcolor filesepfgcolor linehoverbgcolor linehoverfgcolor
     linehoveroutlinecolor mainheadcirclecolor workingfilescirclecolor
-    indexcirclecolor circlecolors linkfgcolor circleoutlinecolor
+    indexcirclecolor circlecolors linkfgcolor circleoutlinecolor jira_url
 }
 foreach var $config_variables {
     config_init_trace $var
