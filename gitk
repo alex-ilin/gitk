@@ -2709,13 +2709,15 @@ proc makewindow {} {
     }
     $fakerowmenu configure -tearoff 0
 
+    # When adding or shuffling items, see the also the headmenu function.
     set headctxmenu .headctxmenu
     makemenu $headctxmenu {
 	{mc "Check out this branch" command cobranch}
-	{mc "Rename this branch" command mvbranch}
-	{mc "Delete this branch" command rmbranch}
 	{mc "Copy branch name" command {clipboard clear; clipboard append $headmenuhead}}
 	{mc "Follow this branch"  command follow_remote_branch_dialog}
+	{xx "" separator}
+	{mc "Rename this branch" command mvbranch}
+	{mc "Delete this branch" command rmbranch}
     }
     $headctxmenu configure -tearoff 0
 
@@ -10156,18 +10158,18 @@ proc headmenu {x y id head} {
     stopfinding
     set headmenuid $id
     set headmenuhead $head
-    array set state {0 normal 1 normal 2 normal 4 normal}
+    array set state {0 normal 2 normal 4 normal 5 normal}
     if {[string match "remotes/*" $head]} {
 	set localhead [string range $head [expr [string last / $head] + 1] end]
 	if {[info exists headids($localhead)]} {
 	    set state(0) disabled
 	}
-	array set state {1 disabled 2 disabled}
+	array set state {4 disabled 5 disabled}
     }
     if {$head eq $mainhead} {
-	array set state {0 disabled 2 disabled 4 disabled}
+	array set state {0 disabled 2 disabled 5 disabled}
     }
-    foreach i {0 1 2 4} {
+    foreach i {0 2 4 5} {
 	$headctxmenu entryconfigure $i -state $state($i)
     }
     tk_popup $headctxmenu $x $y
