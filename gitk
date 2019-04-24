@@ -10172,7 +10172,7 @@ proc headmenu {x y id head} {
 	if {[info exists headids($localhead)]} {
 	    set state(0) disabled
 	}
-	array set state {5 disabled 6 disabled}
+	array set state {5 disabled}
     }
     if {$head eq $mainhead} {
 	array set state {0 disabled 2 disabled 6 disabled}
@@ -10365,7 +10365,24 @@ proc rmbranch {} {
     }
     nowbusy rmbranch
     update
-    if {[catch {exec git branch -D $head} err]} {
+    if {[string match "remotes/*" $head]} {
+	set remote_name [string range $head [string length "remotes/"] end]
+	regexp {[^/]+} $remote_name remote_name
+	set branch_name [string range $head [expr [string last "/" $head] + 1] end]
+
+	# Extra confirmation before deleting a remote branch.
+	if {![confirm_popup [mc "You are about to delete a REMOTE BRANCH.\n\
+		Recovering deleted branches is very difficult, especially remote ones.\n\
+		\n\
+		Are you sure you want to delete the branch %s from the remote \"%s\"?" $branch_name $remote_name]]} {
+	    notbusy rmbranch
+	    return
+	}
+	if {[catch {exec git push $remote_name --delete $branch_name} err]} {
+	    # There are often messages that are not errors.
+	    error_popup $err
+	}
+    } elseif {[catch {exec git branch -D $head} err]} {
 	notbusy rmbranch
 	error_popup $err
 	return
