@@ -2717,6 +2717,7 @@ proc makewindow {} {
 	{mc "Follow this branch"  command follow_remote_branch_dialog}
 	{mc "Open Jira issue" command open_branch_jira_issue}
 	{xx "" separator}
+	{mc "Push to origin" command pushbranch}
 	{mc "Rename this branch" command mvbranch}
 	{mc "Delete this branch" command rmbranch}
     }
@@ -10166,18 +10167,22 @@ proc headmenu {x y id head} {
     stopfinding
     set headmenuid $id
     set headmenuhead $head
-    array set state {0 normal 2 normal 5 normal 6 normal}
+    array set state {0 normal 2 normal 5 normal 6 normal 7 normal}
     if {[string match "remotes/*" $head]} {
 	set localhead [string range $head [expr [string last / $head] + 1] end]
 	if {[info exists headids($localhead)]} {
 	    set state(0) disabled
 	}
-	array set state {5 disabled}
+	array set state {6 disabled}
     }
     if {$head eq $mainhead} {
-	array set state {0 disabled 2 disabled 6 disabled}
+	array set state {0 disabled 2 disabled 7 disabled}
     }
-    foreach i {0 2 5 6} {
+    # Disable the "Push to origin" for the origin's remote branches.
+    if {[string match "remotes/origin/*" $head]} {
+	set state(5) disabled
+    }
+    foreach i {0 2 5 6 7} {
 	$headctxmenu entryconfigure $i -state $state($i)
     }
 
@@ -10393,6 +10398,19 @@ proc rmbranch {} {
     notbusy rmbranch
     dispneartags 0
     run refill_reflist
+}
+
+proc pushbranch {} {
+    global headmenuhead
+
+    nowbusy pushbranch
+    update
+    if {[catch {exec git push origin $headmenuhead} err]} {
+	# There are often messages that are not errors.
+	error_popup $err
+    }
+    notbusy pushbranch
+    run updatecommits
 }
 
 # Display a tree view of local branches, remote branches, and tags according to view_type.
