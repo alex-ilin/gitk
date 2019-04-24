@@ -9784,7 +9784,27 @@ proc mkbranch {} {
 
     set top .branchdialog
 
+    # Suggest a name for the new branch based on the clipboard contents.
     set val(name) ""
+    if {[catch {clipboard get -type STRING} cliptext]} {
+	# The clipboard is empty.
+    } else {
+	set cliptext [string trim $cliptext]
+	# If the clipboard contains the name of a remote branch, strip the
+	# "remotes/remote-name/" prefix by finding the second slash.
+	if {[string match "remotes/*" $cliptext]} {
+	    set prefix ""
+	    if {[regexp {^[^/]+/[^/]+/} $cliptext prefix]} {
+		set cliptext [string range $cliptext [string length $prefix] end]
+	    }
+	}
+	if {([string first " " $cliptext] eq -1)
+	    && ![catch {exec git check-ref-format --branch $cliptext}]
+	} {
+	    set val(name) $cliptext
+	}
+    }
+
     set val(id) $rowmenuid
     set val(command) [list mkbrgo $top]
 
