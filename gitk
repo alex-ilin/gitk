@@ -2715,6 +2715,7 @@ proc makewindow {} {
 	{mc "Check out this branch" command cobranch}
 	{mc "Copy branch name" command {clipboard clear; clipboard append $headmenuhead}}
 	{mc "Follow this branch"  command follow_remote_branch_dialog}
+	{mc "Open Jira issue" command open_branch_jira_issue}
 	{xx "" separator}
 	{mc "Rename this branch" command mvbranch}
 	{mc "Delete this branch" command rmbranch}
@@ -7280,7 +7281,7 @@ proc setlink {id lk} {
 	$ctext tag conf $lk -foreground $linkfgcolor -underline 1
 	if {$known eq 2} {
 	    # Jira issue.
-	    $ctext tag bind $lk <1> [list open_url "$jira_url/browse/$id"]
+	    $ctext tag bind $lk <1> [list open_jira_url $id]
 	} else {
 	    $ctext tag bind $lk <1> [list selbyid $id]
 	}
@@ -7294,6 +7295,13 @@ proc setlink {id lk} {
 
 proc open_url {url} {
     eval exec [auto_execok start] $url
+}
+
+proc open_jira_url {issue} {
+    global jira_url
+    if {($jira_url != "") && ($issue != "")} {
+	open_url "$jira_url/browse/$issue"
+    }
 }
 
 proc appendshortlink {id {pre {}} {post {}}} {
@@ -10153,26 +10161,42 @@ proc readresetstat {fd} {
 
 # context menu for a head
 proc headmenu {x y id head} {
-    global headmenuid headmenuhead headctxmenu mainhead headids
+    global headmenuid headmenuhead headctxmenu mainhead headids jira_url
 
     stopfinding
     set headmenuid $id
     set headmenuhead $head
-    array set state {0 normal 2 normal 4 normal 5 normal}
+    array set state {0 normal 2 normal 5 normal 6 normal}
     if {[string match "remotes/*" $head]} {
 	set localhead [string range $head [expr [string last / $head] + 1] end]
 	if {[info exists headids($localhead)]} {
 	    set state(0) disabled
 	}
-	array set state {4 disabled 5 disabled}
+	array set state {5 disabled 6 disabled}
     }
     if {$head eq $mainhead} {
-	array set state {0 disabled 2 disabled 5 disabled}
+	array set state {0 disabled 2 disabled 6 disabled}
     }
-    foreach i {0 2 4 5} {
+    foreach i {0 2 5 6} {
 	$headctxmenu entryconfigure $i -state $state($i)
     }
+
+    set jira_issue ""
+    regexp {[a-zA-Z]+-[0-9]+} $headmenuhead jira_issue
+    if {($jira_url != "") && ($jira_issue != "")} {
+	$headctxmenu entryconfigure 3 -label [mc "Open Jira issue %s" $jira_issue] -state normal
+    } else {
+	$headctxmenu entryconfigure 3 -label [mc "Open Jira issue"] -state disabled
+    }
+
     tk_popup $headctxmenu $x $y
+}
+
+proc open_branch_jira_issue {} {
+    global headmenuhead jira_url
+    set jira_issue ""
+    regexp {[a-zA-Z]+-[0-9]+} $headmenuhead jira_issue
+    open_jira_url $jira_issue
 }
 
 proc follow_remote_branch_dialog {} {
