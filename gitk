@@ -10156,20 +10156,18 @@ proc headmenu {x y id head} {
     stopfinding
     set headmenuid $id
     set headmenuhead $head
-    array set state {0 normal 1 normal 2 normal 3 normal}
+    array set state {0 normal 1 normal 2 normal 4 normal}
     if {[string match "remotes/*" $head]} {
 	set localhead [string range $head [expr [string last / $head] + 1] end]
 	if {[info exists headids($localhead)]} {
 	    set state(0) disabled
 	}
-	array set state {1 disabled 2 disabled 3 normal}
+	array set state {1 disabled 2 disabled}
     }
     if {$head eq $mainhead} {
-	array set state {0 disabled 2 disabled 3 disabled}
-    } else {
-	set state(3) disabled
+	array set state {0 disabled 2 disabled 4 disabled}
     }
-    foreach i {0 1 2 3} {
+    foreach i {0 1 2 4} {
 	$headctxmenu entryconfigure $i -state $state($i)
     }
     tk_popup $headctxmenu $x $y
