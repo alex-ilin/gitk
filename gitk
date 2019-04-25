@@ -10403,9 +10403,8 @@ proc rmbranch {} {
 	    notbusy rmbranch
 	    return
 	}
-	if {[catch {exec git push $remote_name --delete $branch_name} err]} {
-	    # There are often messages that are not errors.
-	    error_popup $err
+	if {[catch {exec -ignorestderr git push --porcelain $remote_name --delete $branch_name} err]} {
+	    error_popup [mc "There was an error deleting the branch.\n\n%s" $err]
 	}
     } elseif {[catch {exec git branch -D $head} err]} {
 	notbusy rmbranch
@@ -10425,9 +10424,8 @@ proc pushbranch {} {
 
     nowbusy pushbranch
     update
-    if {[catch {exec git push origin $headmenuhead} err]} {
-	# There are often messages that are not errors.
-	error_popup $err
+    if {[catch {exec -ignorestderr git push --porcelain origin $headmenuhead} err]} {
+	error_popup [mc "There was an error pushing the branch.\n\n%s" $err]
     }
     notbusy pushbranch
     run updatecommits
