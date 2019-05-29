@@ -9860,6 +9860,7 @@ proc branchdia {top valvar uivar} {
     ${NS}::label $top.nlab -text [mc "Name:"]
     ${NS}::entry $top.name -width 40
     $top.name insert 0 $val(name)
+    $top.name selection range 0 [string length $val(name)]
     grid $top.nlab $top.name -sticky w
     ${NS}::frame $top.buts
     ${NS}::button $top.buts.go -text $ui(accept) -command $val(command)
