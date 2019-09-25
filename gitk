@@ -7639,7 +7639,7 @@ proc selectline {l isnew {desired_loc {}} {switch_to_patch 0}} {
     }
     set info $commitinfo($id)
     set date [formatdate [lindex $info 2]]
-    $ctext insert end "[mc "Author"]: [lindex $info 1]  $date\n"
+    $ctext insert end "[mc "Author"]:    [lindex $info 1]  $date\n"
     set date [formatdate [lindex $info 4]]
     $ctext insert end "[mc "Committer"]: [lindex $info 3]  $date\n"
     if {[info exists idtags($id)]} {
