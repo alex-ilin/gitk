@@ -7282,7 +7282,7 @@ proc setlinks {links text offset} {
 	set url [string range $text $s2 $e2]
 	incr e2
 	$ctext tag delete link$linknum
-	$ctext tag add link$linknum "$start + $s2 c" "$start + $e2 c"
+	$ctext tag add link$linknum "$offset + $s2 c" "$offset + $e2 c"
 	setwlink $url link$linknum
 	incr linknum
     }
