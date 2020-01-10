@@ -7683,7 +7683,7 @@ proc selectline {l isnew {desired_loc {}} {switch_to_patch 0}} {
 	$ctext insert end "[mc "Branch"]: "
 	$ctext mark set branch "end -1c"
 	$ctext mark gravity branch left
-	$ctext insert end "\n[mc "Follows"]: "
+	$ctext insert end "\n[mc "Follows"]:  "
 	$ctext mark set follows "end -1c"
 	$ctext mark gravity follows left
 	$ctext insert end "\n[mc "Precedes"]: "
