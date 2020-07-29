@@ -9028,6 +9028,12 @@ proc gotocommit {} {
     # If a range of commits is requested, mark the first one, then select
     # the second one and show a diff between them.
     set sha1string [string trim $sha1string]
+    # Replace one "..." with "..". This is useful for commit ranges copied from
+    # the git-fetch output.
+    set pos [string first ... $sha1string]
+    if {$pos > 0} {
+	set sha1string [string replace $sha1string $pos $pos]
+    }
     set pos [string first .. $sha1string]
     if {$pos > 0} {
 	set firstrev [resolveshortname [string range $sha1string 0 [expr $pos - 1]]]
