@@ -10189,10 +10189,11 @@ proc resethead {} {
     grid $w.f.hard -sticky w
     bind $w.f.hard <Double-1> $ok_cmd
     pack $w.f -side top -fill x -padx 4
-    ${NS}::button $w.ok -text [mc OK] -command $ok_cmd
+    ${NS}::button $w.ok -default active -text [mc OK] -command $ok_cmd
     pack $w.ok -side left -fill x -padx 20 -pady 20
     ${NS}::button $w.cancel -text [mc Cancel] -command "set resethead_close 1"
     bind $w <Key-Escape> "set resethead_close 1"
+    bind $w <Key-Return> $ok_cmd
     pack $w.cancel -side right -fill x -padx 20 -pady 20
     bind $w <Visibility> "grab $w; focus $w"
     tkwait variable resethead_close
