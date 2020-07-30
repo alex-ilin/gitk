@@ -2645,6 +2645,8 @@ proc makewindow {} {
     bind . <F5> updatecommits
     bindmodfunctionkey Shift 5 reloadcommits
     bind . <F2> showrefs
+    bind . <Shift-F10> keyboardrowmenu
+    bind . <Key-App> keyboardrowmenu
     bind . <F6> {show_tree_of_references_dialog "localBranches"}
     bind . <F7> {show_tree_of_references_dialog "remoteBranches"}
     bind . <F8> {show_tree_of_references_dialog "tags"}
@@ -9261,7 +9263,7 @@ proc mstime {} {
 }
 
 proc rowmenu {x y id} {
-    global rowctxmenu selectedline rowmenuid curview
+    global rowctxmenu selectedline rowmenuid curview canvy0
     global nullid nullid2 fakerowmenu mainhead markedid
 
     stopfinding
@@ -9294,7 +9296,25 @@ proc rowmenu {x y id} {
     $menu entryconfigure [mca "Make patch"] -state $state
     $menu entryconfigure [mca "Diff this -> marked commit"] -state $mstate
     $menu entryconfigure [mca "Diff marked commit -> this"] -state $mstate
+    if {$x == -1 && $y == -1} {
+	# Special handling for the context menu called from the keyboard using
+	# the AppMenu button or the Shift-F10 combination.
+	if {$selectedline eq {}} return
+	if {![commitinview $id $curview]} return
+	set vr [visiblerows]
+	set rowtop [lindex $vr 0]
+	set rowbot [lindex $vr 1]
+	if {$selectedline < $rowtop || $selectedline >= $rowbot} return
+	set linefromtop [expr $selectedline - $rowtop]
+	set y [expr [winfo rooty .] + $canvy0 + [yc $linefromtop]]
+	set x [expr [winfo rootx .] + 100]
+    }
     tk_popup $menu $x $y
+}
+
+proc keyboardrowmenu {} {
+    global currentid
+    rowmenu -1 -1 $currentid
 }
 
 proc markthis {id} {
