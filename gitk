@@ -13087,7 +13087,7 @@ set markbgcolor "#e0e0ff"
 set headbgcolor "#00ff00"
 set headfgcolor black
 set headoutlinecolor black
-set stashbgcolor #ddddff
+set stashbgcolor #8888ff
 set remotebgcolor #ffddaa
 set tagbgcolor yellow
 set tagfgcolor black
