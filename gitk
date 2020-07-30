@@ -6805,7 +6805,7 @@ proc drawtags {id x xt y1} {
     foreach tag $marks {
 	incr i
 	set newTag $tag
-	regsub {^remotes} $newTag "r.." newTag
+	regsub {^remotes} $newTag "rem" newTag
 
 	if {$i >= $ntags && $i < $ntags + $nheads && $tag eq $mainhead} {
 	    set wid [font measure mainfontbold $newTag]
@@ -6855,7 +6855,7 @@ proc drawtags {id x xt y1} {
 		-width 1 -outline black -fill $col -tags tag.$id
 	    if {[regexp {^(remotes/.*/|remotes/)} $tag match remoteprefix]} {
 		set newRemotePrefix $remoteprefix
-		regsub {^remotes} $newRemotePrefix "r.." newRemotePrefix
+		regsub {^remotes} $newRemotePrefix "rem" newRemotePrefix
 
 	        set rwid [font measure mainfont $newRemotePrefix]
 		set xi [expr {$x + 1}]
