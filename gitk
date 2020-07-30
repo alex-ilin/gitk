@@ -2099,6 +2099,7 @@ proc makewindow {} {
     global have_tk85 have_tk86 use_ttk NS
     global git_version
     global worddiff
+    global stashctxmenu
 
     # The "mc" arguments here are purely so that xgettext
     # sees the following string as needing to be translated
@@ -2715,6 +2716,8 @@ proc makewindow {} {
 
     set fakerowmenu .fakerowmenu
     makemenu $fakerowmenu {
+	{mc "Stash uncommitted changes" command stashpush}
+	{xx "" separator}
 	{mc "Diff this -> selected" command {diffvssel 0}}
 	{mc "Diff selected -> this" command {diffvssel 1}}
 	{mc "DirDiffTool this -> selected" command {externalDiffToolVsSel 0}}
@@ -2742,6 +2745,14 @@ proc makewindow {} {
 	{mc "Delete this branch" command rmbranch}
     }
     $headctxmenu configure -tearoff 0
+
+    # When adding or shuffling items, see the also the stashmenu function.
+    set stashctxmenu .stashctxmenu
+    makemenu $stashctxmenu {
+	{mc "Stash pop" command stashpop}
+	{mc "Stash drop" command stashdrop}
+    }
+    $stashctxmenu configure -tearoff 0
 
     global flist_menu worktree
     set flist_menu .flistctxmenu
@@ -6871,6 +6882,8 @@ proc drawtags {id x xt y1} {
 	    $canv bind $t <1> $tagclick
 	} elseif {$nheads >= 0} {
 	    $canv bind $t $ctxbut [list headmenu %X %Y $id $tag_quoted]
+	} else {
+	    $canv bind $t $ctxbut [list stashmenu %X %Y $id $tag_quoted]
 	}
     }
     return $xt
@@ -10282,6 +10295,61 @@ proc headmenu {x y id head} {
     }
 
     tk_popup $headctxmenu $x $y
+}
+
+# Context menu for a stash branch ref.
+proc stashmenu {x y id head} {
+    global stashctxmenu
+    stopfinding
+    tk_popup $stashctxmenu $x $y
+}
+
+proc stashpop {} {
+    global stop_wait
+    nowbusy stashpop [mc "Stash pop"]
+    update
+    if {[catch {set fd [open [list | git stash pop 2>@1] r]} err]} {
+	error_popup $err
+    }
+    notbusy stashpop
+    # For some reason immediately calling updatecommits fails to update the
+    # stash branch pointer.
+    after 1000 set stop_wait &
+    vwait stop_wait
+    unset stop_wait
+    run updatecommits
+}
+
+proc stashdrop {} {
+    global stop_wait
+    nowbusy stashdrop [mc "Stash drop"]
+    update
+    if {[catch {set fd [open [list | git stash drop 2>@1] r]} err]} {
+	error_popup $err
+    }
+    notbusy stashdrop
+    # This updatecommits call works without the delay, but we do it anyway for
+    # consistency with other stash operations.
+    after 1000 set stop_wait &
+    vwait stop_wait
+    unset stop_wait
+    run updatecommits
+}
+
+proc stashpush {} {
+    global stop_wait
+    nowbusy stashpush [mc "Stash push"]
+    update
+    if {[catch {set fd [open [list | git stash push 2>@1] r]} err]} {
+	error_popup $err
+    }
+    notbusy stashpush
+    # For some reason immediately calling updatecommits fails to update the
+    # stash branch pointer.
+    after 1000 set stop_wait &
+    vwait stop_wait
+    unset stop_wait
+    run updatecommits
 }
 
 proc open_branch_jira_issue {} {
