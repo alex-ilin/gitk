@@ -5396,7 +5396,7 @@ proc setcanvscroll {} {
     global canv canv2 canv3 numcommits linespc canvxmax canvy0
     global lastscrollset lastscrollrows
 
-    set ymax [expr {$canvy0 + ($numcommits - 0.5) * $linespc + 2}]
+    set ymax [expr {$canvy0 + $numcommits * $linespc + 2}]
     $canv conf -scrollregion [list 0 0 $canvxmax $ymax]
     $canv2 conf -scrollregion [list 0 0 0 $ymax]
     $canv3 conf -scrollregion [list 0 0 0 $ymax]
@@ -5413,12 +5413,12 @@ proc visiblerows {} {
     if {$ymax eq {} || $ymax == 0} return
     set f [$canv yview]
     set y0 [expr {int([lindex $f 0] * $ymax)}]
-    set r0 [expr {int(($y0 - 3) / $linespc) - 1}]
+    set r0 [expr {int($y0 / $linespc)}]
     if {$r0 < 0} {
 	set r0 0
     }
     set y1 [expr {int([lindex $f 1] * $ymax)}]
-    set r1 [expr {int(($y1 - 3) / $linespc) + 1}]
+    set r1 [expr {int($y1 / $linespc)}]
     if {$r1 >= $numcommits} {
 	set r1 [expr {$numcommits - 1}]
     }
