@@ -2691,44 +2691,44 @@ proc makewindow {} {
     # When changing this menu update indexes in proc rowmenu.
     set rowctxmenu .rowctxmenu
     makemenu $rowctxmenu {
-	{mc "Create new branch" command mkbranch}
-	{mc "Reset HEAD branch to here" command resethead}
-	{mc "Interactive rebase onto here" command rebasehere}
-	{mc "Cherry-pick this commit" command cherrypick}
-	{mc "Create tag" command mktag}
+	{mc "Create new &branch" command mkbranch}
+	{mc "Re&set HEAD branch to here" command resethead}
+	{mc "Interactive &rebase onto here" command rebasehere}
+	{mc "Cherry-&pick this commit" command cherrypick}
+	{mc "Create &tag" command mktag}
 	{xx "" separator}
 	{mc "Diff this -> selected" command {diffvssel 0}}
 	{mc "Diff selected -> this" command {diffvssel 1}}
 	{mc "DirDiffTool this -> selected" command {externalDiffToolVsSel 0}}
 	{mc "DirDiffTool selected -> this" command {externalDiffToolVsSel 1}}
 	{xx "" separator}
-	{mc "Mark this commit" command markhere}
+	{mc "&Mark this commit" command markhere}
 	{mc "Return to mark" command gotomark}
 	{mc "Find descendant of this and mark" command find_common_desc}
-	{mc "Compare with marked commit" command compare_commits}
-	{mc "Diff this -> marked commit" command {diffvsmark 0}}
-	{mc "Diff marked commit -> this" command {diffvsmark 1}}
+	{mc "&Compare with marked commit" command compare_commits}
+	{mc "Diff this &-> marked commit" command {diffvsmark 0}}
+	{mc "&Diff marked commit -> this" command {diffvsmark 1}}
 	{mc "DirDiffTool this -> marked" command {externalDiffToolVsMarked 0}}
 	{mc "DirDiffTool marked -> this" command {externalDiffToolVsMarked 1}}
 	{xx "" separator}
 	{mc "Make patch" command mkpatch}
 	{mc "Copy commit summary" command copysummary}
 	{mc "Write commit to file" command writecommit}
-	{mc "Revert this commit" command revert}
+	{mc "Re&vert this commit" command revert}
     }
     $rowctxmenu configure -tearoff 0
 
     set fakerowmenu .fakerowmenu
     makemenu $fakerowmenu {
-	{mc "Stash uncommitted changes" command stashpush}
+	{mc "&Stash uncommitted changes" command stashpush}
 	{xx "" separator}
 	{mc "Diff this -> selected" command {diffvssel 0}}
 	{mc "Diff selected -> this" command {diffvssel 1}}
 	{mc "DirDiffTool this -> selected" command {externalDiffToolVsSel 0}}
 	{mc "DirDiffTool selected -> this" command {externalDiffToolVsSel 1}}
 	{xx "" separator}
-	{mc "Diff this -> marked commit" command {diffvsmark 0}}
-	{mc "Diff marked commit -> this" command {diffvsmark 1}}
+	{mc "Diff this &-> marked commit" command {diffvsmark 0}}
+	{mc "&Diff marked commit -> this" command {diffvsmark 1}}
 	{mc "DirDiffTool this -> marked" command {externalDiffToolVsMarked 0}}
 	{mc "DirDiffTool marked -> this" command {externalDiffToolVsMarked 1}}
 	{xx "" separator}
@@ -2739,43 +2739,43 @@ proc makewindow {} {
     # When adding or shuffling items, see the also the headmenu function.
     set headctxmenu .headctxmenu
     makemenu $headctxmenu {
-	{mc "Check out this branch" command cobranch}
-	{mc "Copy branch name" command {clipboard clear; clipboard append $headmenuhead}}
+	{mc "Check out this &branch" command cobranch}
+	{mc "&Copy branch name" command {clipboard clear; clipboard append $headmenuhead}}
 	{mc "Follow this branch"  command follow_remote_branch_dialog}
-	{mc "Open Jira issue" command open_branch_jira_issue}
+	{mc "Open &Jira issue" command open_branch_jira_issue}
 	{xx "" separator}
-	{mc "Push to origin" command pushbranch}
-	{mc "Rename this branch" command mvbranch}
-	{mc "Delete this branch" command rmbranch}
+	{mc "&Push to origin" command pushbranch}
+	{mc "Re&name this branch" command mvbranch}
+	{mc "&Delete this branch" command rmbranch}
     }
     $headctxmenu configure -tearoff 0
 
     # When adding or shuffling items, see the also the stashmenu function.
     set stashctxmenu .stashctxmenu
     makemenu $stashctxmenu {
-	{mc "Stash pop" command stashpop}
-	{mc "Stash drop" command stashdrop}
+	{mc "Stash &pop" command stashpop}
+	{mc "Stash &drop" command stashdrop}
     }
     $stashctxmenu configure -tearoff 0
 
     global flist_menu worktree
     set flist_menu .flistctxmenu
     makemenu $flist_menu {
-	{mc "Highlight this too" command {flist_hl 0}}
-	{mc "Highlight this only" command {flist_hl 1}}
-	{mc "External diff" command {external_diff}}
-	{mc "Save file as" command {save_file_as}}
-	{mc "Blame parent commit" command {external_blame 1}}
-	{mc "Edit file" command {edit_in_wc}}
-	{mc "Copy path" command {clipboard clear; clipboard append [file join $worktree $flist_menu_file]}}
+	{mc "&Highlight this too" command {flist_hl 0}}
+	{mc "Highlight this &only" command {flist_hl 1}}
+	{mc "External &diff" command {external_diff}}
+	{mc "Save file &as" command {save_file_as}}
+	{mc "&Blame parent commit" command {external_blame 1}}
+	{mc "&Edit file" command {edit_in_wc}}
+	{mc "&Copy path" command {clipboard clear; clipboard append [file join $worktree $flist_menu_file]}}
     }
     $flist_menu configure -tearoff 0
 
     global diff_menu
     set diff_menu .diffctxmenu
     makemenu $diff_menu {
-	{mc "Show origin of this line" command show_line_source}
-	{mc "Run git gui blame on this line" command {external_blame_diff}}
+	{mc "Show &origin of this line" command show_line_source}
+	{mc "Run git gui &blame on this line" command {external_blame_diff}}
     }
     $diff_menu configure -tearoff 0
 }
