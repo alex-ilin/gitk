@@ -1262,6 +1262,8 @@ proc comes_before {a b} {
     return [expr {[rowofcommit $a] < [rowofcommit $b]}]
 }
 
+# Binary search for element $elt in the list $l. Return index if found,
+# otherwise return 0.
 proc bsearch {l elt} {
     if {[llength $l] == 0 || $elt <= [lindex $l 0]} {
 	return 0
@@ -5388,6 +5390,8 @@ proc initlayout {} {
     setcanvscroll
 }
 
+# Set the vertical scroll range for top three panels ($canv, $canv2 and $canv3)
+# based on the number of commits in the view ($numcommits).
 proc setcanvscroll {} {
     global canv canv2 canv3 numcommits linespc canvxmax canvy0
     global lastscrollset lastscrollrows
@@ -5400,6 +5404,8 @@ proc setcanvscroll {} {
     set lastscrollrows $numcommits
 }
 
+# Return the range of the visible rows in $canv: [first last], where first >= 0,
+# last < $numcommits.
 proc visiblerows {} {
     global canv numcommits linespc
 
