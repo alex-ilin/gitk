@@ -10216,14 +10216,17 @@ proc resethead {} {
     ${NS}::labelframe $w.f -text [mc "Reset type:"]
     set resettype mixed
     ${NS}::radiobutton $w.f.soft -value soft -variable resettype \
+	-underline 0 \
 	-text [mc "Soft: Leave working tree and index untouched"]
     grid $w.f.soft -sticky w
     bind $w.f.soft <Double-1> $ok_cmd
     ${NS}::radiobutton $w.f.mixed -value mixed -variable resettype \
+	-underline 0 \
 	-text [mc "Mixed: Leave working tree untouched, reset index"]
     grid $w.f.mixed -sticky w
     bind $w.f.mixed <Double-1> $ok_cmd
     ${NS}::radiobutton $w.f.hard -value hard -variable resettype \
+	-underline 0 \
 	-text [mc "Hard: Reset working tree and index\n(discard ALL local changes)"]
     grid $w.f.hard -sticky w
     bind $w.f.hard <Double-1> $ok_cmd
@@ -10231,6 +10234,9 @@ proc resethead {} {
     ${NS}::button $w.ok -default active -text [mc OK] -command $ok_cmd
     pack $w.ok -side left -fill x -padx 20 -pady 20
     ${NS}::button $w.cancel -text [mc Cancel] -command "set resethead_close 1"
+    bind $w <Key-s> "$w.f.soft invoke"
+    bind $w <Key-m> "$w.f.mixed invoke"
+    bind $w <Key-h> "$w.f.hard invoke"
     bind $w <Key-Escape> "set resethead_close 1"
     bind $w <Key-Return> $ok_cmd
     pack $w.cancel -side right -fill x -padx 20 -pady 20
