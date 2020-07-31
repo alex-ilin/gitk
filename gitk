@@ -2905,6 +2905,7 @@ proc makewindow {} {
         {mc "Open &Jira issue" command open_branch_jira_issue}
         {xx "" separator}
         {mc "&Push to origin" command pushbranch}
+        {mc "&Force push to origin" command pushbranchforce}
         {mc "Re&name this branch" command mvbranch}
         {mc "&Delete this branch" command rmbranch}
     }
@@ -10473,22 +10474,23 @@ proc headmenu {x y id head} {
     stopfinding
     set headmenuid $id
     set headmenuhead $head
-    array set state {0 normal 2 normal 5 normal 6 normal 7 normal}
+    array set state {0 normal 2 normal 5 normal 6 normal 7 normal 8 normal}
     if {[string match "remotes/*" $head]} {
         set localhead [string range $head [expr [string last / $head] + 1] end]
         if {[info exists headids($localhead)]} {
             set state(0) disabled
         }
-        array set state {6 disabled}
+        array set state {7 disabled}
     }
     if {$head eq $mainhead} {
-        array set state {0 disabled 2 disabled 7 disabled}
+        array set state {0 disabled 2 disabled 8 disabled}
     }
-    # Disable the "Push to origin" for the origin's remote branches.
+    # Disable the "Push [--force] to origin" for the origin's remote branches.
     if {[string match "remotes/origin/*" $head]} {
         set state(5) disabled
+        set state(6) disabled
     }
-    foreach i {0 2 5 6 7} {
+    foreach i {0 2 5 6 7 8} {
         $headctxmenu entryconfigure $i -state $state($i)
     }
 
@@ -10769,6 +10771,18 @@ proc pushbranch {} {
 	error_popup [mc "There was an error pushing the branch.\n\n%s" $err]
     }
     notbusy pushbranch
+    run updatecommits
+}
+
+proc pushbranchforce {} {
+    global headmenuhead
+
+    nowbusy pushbranchforce
+    update
+    if {[catch {exec -ignorestderr git push --porcelain --force-with-lease origin $headmenuhead} err]} {
+	error_popup [mc "There was an error pushing the branch.\n\n%s" $err]
+    }
+    notbusy pushbranchforce
     run updatecommits
 }
 
