@@ -7669,6 +7669,7 @@ proc appendrefs {pos ids var} {
         # If we are displaying heads, and there are too many,
         # see if there are some important heads to display.
         # Currently that are the current head and heads listed in $visiblerefs option
+        # TODO: add all local refs
         set itags {}
         if {$var eq "idheads"} {
             set utags {}
