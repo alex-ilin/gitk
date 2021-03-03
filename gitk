@@ -2714,7 +2714,7 @@ proc makewindow {} {
         {mc "DirDiffTool selected -> this" command {externalDiffToolVsSel 1}}
         {xx "" separator}
         {mc "&Mark this commit" command markhere}
-        {mc "Return to mark" command gotomark}
+        {mc "Return to mar&k" command gotomark}
         {mc "Find descendant of this and mark" command find_common_desc}
         {mc "&Compare with marked commit" command compare_commits}
         {mc "Diff this &-> marked commit" command {diffvsmark 0}}
