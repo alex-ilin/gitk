@@ -3952,7 +3952,7 @@ proc edit_in_wc {} {
     global flist_menu_file
     set edit_cmd [exec git config core.editor]
     if { [catch { exec $edit_cmd [file join $worktree $flist_menu_file] &} msg] } {
-        # igrore errors, if any
+        tk_messageBox -message $msg -type ok
     }
 }
 
