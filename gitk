@@ -44,6 +44,17 @@ proc is_Cygwin {} {
 ##
 ## PATH lookup
 
+proc has_pathext_suffix {name} {
+	global env
+	set pathext [split $env(PATHEXT) {;}]
+	foreach ext $pathext {
+		if {[string match -nocase "*${ext}" $name]} {
+			return 1
+		}
+	}
+	return 0
+}
+
 set _search_path {}
 proc _which {what args} {
 	global env _search_exe _search_path
@@ -71,7 +82,10 @@ proc _which {what args} {
 		}
 	}
 
-	if {[is_Windows] && [lsearch -exact $args -script] >= 0} {
+	if {[is_Windows] && ( \
+		[lsearch -exact $args -script] >= 0 \
+		|| [has_pathext_suffix $what])} \
+	{
 		set suffix {}
 	} else {
 		set suffix $_search_exe
