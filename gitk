@@ -10267,7 +10267,7 @@ proc cherrypick {} {
     update
     # Unfortunately git-cherry-pick writes stuff to stderr even when
     # no error occurs, and exec takes that as an indication of error...
-    if {[catch {exec cmd.exe /k "git cherry-pick -r $rowmenuid 2>&1"} err]} {
+    if {[catch {exec cmd.exe /k "git cherry-pick $rowmenuid 2>&1"} err]} {
         notbusy cherrypick
         if {[regexp -line \
                  {Entry '(.*)' (would be overwritten by merge|not uptodate)} \
