@@ -369,6 +369,7 @@ proc parseviewargs {n arglist} {
     set allknown 1
     set filtered 0
     set i -1
+    lappend revargs --exclude=refs/jj/keep/*
     foreach arg $arglist {
         incr i
         if {$nextisval} {
@@ -2003,6 +2004,8 @@ proc readrefs {} {
         set ref [string range $line 41 end]
         if {![string match "refs/*" $ref]} continue
         set name [string range $ref 5 end]
+        # Skip Jujutsu refs, there will be too many.
+        if {[string match "jj/keep/*" $name]} continue
         if {[string match "remotes/*" $name]} {
             if {![string match "*/HEAD" $name] && !$hideremotes} {
                 set headids($name) $id
@@ -11126,6 +11129,7 @@ proc getallcommits {} {
         return
     }
     set cmd [list git rev-list --parents]
+    set cmd [concat $cmd "--not --glob=jj/keep --not"]
     set allcupdate [expr {$seeds ne {}}]
     if {!$allcupdate} {
         set ids "--all"
